@@ -1,7 +1,27 @@
 
 body {
-  margin: 5em auto;
-  max-width: 50em;
+  margin: 5em auto
+}
 
-  font-family: "Helvetica, Arial, sans-serif";
+.chat-app {
+  overflow: hidden;
+}
+
+.channel-list {
+  background-color: #eee;
+  /* Make channel list span to bottom of column */
+  padding-bottom: 100%;
+  margin-bottom: -100%;
+}
+
+.chat-message:first-child {
+  margin: 0 auto 1em;
+}
+
+.chat-message:last-child {
+  margin: 1em auto 0;
+}
+
+.chat-message {
+  margin: 1em auto;
 }

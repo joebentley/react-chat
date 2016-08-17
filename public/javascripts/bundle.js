@@ -30778,39 +30778,104 @@ module.exports = require('./lib/React');
 'use strict';
 
 var $ = require('jquery');
-var test = require('./test.jsx');
-
-$(test);
-
-},{"./test.jsx":176,"jquery":27}],176:[function(require,module,exports){
-'use strict';
-
-var $ = require('jquery');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
 module.exports = function () {
-  var HelloMessage = React.createClass({
-    displayName: 'HelloMessage',
+  var Chat = React.createClass({
+    displayName: 'Chat',
+
+    render: function render() {
+      return React.createElement(
+        'div',
+        { className: 'row panel panel-default chat-app' },
+        React.createElement(ChannelList, null),
+        React.createElement(ChatArea, null)
+      );
+    }
+  });
+
+  var ChannelList = React.createClass({
+    displayName: 'ChannelList',
+
+    render: function render() {
+      return React.createElement(
+        'div',
+        { className: 'col-xs-3 panel-body channel-list' },
+        'Hello'
+      );
+    }
+  });
+
+  var ChatArea = React.createClass({
+    displayName: 'ChatArea',
+
+    render: function render() {
+      return React.createElement(
+        'div',
+        { className: 'col-xs-9 panel-body' },
+        React.createElement(MessageList, null)
+      );
+    }
+  });
+
+  var MessageList = React.createClass({
+    displayName: 'MessageList',
+
+    render: function render() {
+      var dummy = [{ id: 1, name: 'joe', text: 'hello marie!' }, { id: 2, name: 'marie', text: 'hey joe' }];
+
+      var messages = dummy.map(function (message) {
+        return React.createElement(Message, { key: message.id, name: message.name, text: message.text });
+      });
+
+      return React.createElement(
+        'div',
+        null,
+        messages
+      );
+    }
+  });
+
+  var Message = React.createClass({
+    displayName: 'Message',
 
     propTypes: {
-      name: React.propTypes.string
+      name: React.PropTypes.string,
+      text: React.PropTypes.string
     },
 
     render: function render() {
       return React.createElement(
         'div',
-        null,
-        'Hello ',
-        this.props.name
+        { className: 'row chat-message' },
+        React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'strong',
+            null,
+            this.props.name
+          )
+        ),
+        React.createElement(
+          'div',
+          null,
+          this.props.text
+        )
       );
     }
   });
 
-  ReactDOM.render(React.createElement(HelloMessage, { name: 'John' }), $('#container')[0]);
+  ReactDOM.render(React.createElement(Chat, null), $('#chatContainer')[0]);
 };
 
-},{"jquery":27,"react":174,"react-dom":29}],177:[function(require,module,exports){
+},{"jquery":27,"react":174,"react-dom":29}],176:[function(require,module,exports){
+'use strict';
+
+require('./chat.jsx')();
+
+},{"./chat.jsx":175}],177:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -30972,5 +31037,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[175])
+},{}]},{},[176])
 //# sourceMappingURL=bundle.js.map

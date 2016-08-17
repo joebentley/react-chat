@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "watchify src/main.js -o 'node_modules/.bin/exorcist public/bundle.js.map > public/bundle.js' -t [ babelify --presets [ es2015 react ] ] -d",
+    "watch": "watchify src/main.js -o 'node_modules/.bin/exorcist public/bundle.js.map > public/javascripts/bundle.js' -t [ babelify --presets [ es2015 react ] ] -d",
     "start": "nodemon index.js"
   },
   "repository": {
