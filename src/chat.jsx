@@ -1,3 +1,4 @@
+const $ = require('jquery')
 const React = require('react')
 const ReactDOM = require('react-dom')
 
@@ -7,7 +8,7 @@ module.exports = function (domElem) {
       return (
         <div className="row panel panel-default chat-app row-eq-height">
           <ChannelList />
-          <ChatArea />
+          <ChatArea url="/api/messages" pollInterval={3000} />
         </div>
       )
     }
@@ -24,12 +25,44 @@ module.exports = function (domElem) {
   })
 
   let ChatArea = React.createClass({
+    propTypes: {
+      url: React.PropTypes.string,
+      pollInterval: React.PropTypes.number
+    },
+
+    loadMessagesFromServer: function () {
+      $.ajax({
+        url: this.props.url,
+        dataType: 'json',
+        cache: false,
+        success: function (data) {
+          this.setState({data})
+        }.bind(this),
+        error: function (xhr, status, err) {
+          console.error(this.props.url, status, err.toString())
+        }.bind(this)
+      })
+    },
+
+    getInitialState: function () {
+      return { data: [] }
+    },
+
+    componentDidMount: function () {
+      this.loadMessagesFromServer()
+      setInterval(this.loadMessagesFromServer, this.props.pollInterval)
+    },
+
+    handleSubmit: function (message) {
+      console.log(message)
+    },
+
     render: function () {
       return (
         <div className="col-xs-9 panel-body">
-          <MessageList />
+          <MessageList data={this.state.data} />
           <div className="row bottom chat-input-container">
-            <InputBox />
+            <InputBox onMessageSubmit={this.handleSubmit}/>
           </div>
         </div>
       )
@@ -37,10 +70,12 @@ module.exports = function (domElem) {
   })
 
   let MessageList = React.createClass({
-    render: function () {
-      var dummy = [ { id: 1, name: 'joe', text: 'hello marie!' }, { id: 2, name: 'marie', text: 'hey joe' } ]
+    propTypes: {
+      data: React.PropTypes.array
+    },
 
-      var messages = dummy.map(function (message) {
+    render: function () {
+      var messages = this.props.data.map(function (message) {
         return (
           <Message key={message.id} name={message.name} text={message.text} />
         )
@@ -71,10 +106,23 @@ module.exports = function (domElem) {
   })
 
   let InputBox = React.createClass({
+    propTypes: {
+      onMessageSubmit: React.PropTypes.func
+    },
+
+    handleKeyDown: function (e) {
+      if (e.keyCode === 13) {
+        this.props.onMessageSubmit(e.target.value)
+      }
+    },
+
     render: function () {
       return (
         <div className="chat-input">
-          <input type="text" className="chat-input-box" id="inputMessage" placeholder="Say something!"/>
+          <input type="text" className="chat-input-box"
+            id="inputMessage"
+            placeholder="Say something!"
+            onKeyDown={this.handleKeyDown} />
         </div>
       )
     }

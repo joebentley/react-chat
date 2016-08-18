@@ -30777,6 +30777,7 @@ module.exports = require('./lib/React');
 },{"./lib/React":55}],175:[function(require,module,exports){
 'use strict';
 
+var $ = require('jquery');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -30789,7 +30790,7 @@ module.exports = function (domElem) {
         'div',
         { className: 'row panel panel-default chat-app row-eq-height' },
         React.createElement(ChannelList, null),
-        React.createElement(ChatArea, null)
+        React.createElement(ChatArea, { url: '/api/messages', pollInterval: 3000 })
       );
     }
   });
@@ -30809,15 +30810,47 @@ module.exports = function (domElem) {
   var ChatArea = React.createClass({
     displayName: 'ChatArea',
 
+    propTypes: {
+      url: React.PropTypes.string,
+      pollInterval: React.PropTypes.number
+    },
+
+    loadMessagesFromServer: function loadMessagesFromServer() {
+      $.ajax({
+        url: this.props.url,
+        dataType: 'json',
+        cache: false,
+        success: function (data) {
+          this.setState({ data: data });
+        }.bind(this),
+        error: function (xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+        }.bind(this)
+      });
+    },
+
+    getInitialState: function getInitialState() {
+      return { data: [] };
+    },
+
+    componentDidMount: function componentDidMount() {
+      this.loadMessagesFromServer();
+      setInterval(this.loadMessagesFromServer, this.props.pollInterval);
+    },
+
+    handleSubmit: function handleSubmit(message) {
+      console.log(message);
+    },
+
     render: function render() {
       return React.createElement(
         'div',
         { className: 'col-xs-9 panel-body' },
-        React.createElement(MessageList, null),
+        React.createElement(MessageList, { data: this.state.data }),
         React.createElement(
           'div',
           { className: 'row bottom chat-input-container' },
-          React.createElement(InputBox, null)
+          React.createElement(InputBox, { onMessageSubmit: this.handleSubmit })
         )
       );
     }
@@ -30826,10 +30859,12 @@ module.exports = function (domElem) {
   var MessageList = React.createClass({
     displayName: 'MessageList',
 
-    render: function render() {
-      var dummy = [{ id: 1, name: 'joe', text: 'hello marie!' }, { id: 2, name: 'marie', text: 'hey joe' }];
+    propTypes: {
+      data: React.PropTypes.array
+    },
 
-      var messages = dummy.map(function (message) {
+    render: function render() {
+      var messages = this.props.data.map(function (message) {
         return React.createElement(Message, { key: message.id, name: message.name, text: message.text });
       });
 
@@ -30874,11 +30909,24 @@ module.exports = function (domElem) {
   var InputBox = React.createClass({
     displayName: 'InputBox',
 
+    propTypes: {
+      onMessageSubmit: React.PropTypes.func
+    },
+
+    handleKeyDown: function handleKeyDown(e) {
+      if (e.keyCode === 13) {
+        this.props.onMessageSubmit(e.target.value);
+      }
+    },
+
     render: function render() {
       return React.createElement(
         'div',
         { className: 'chat-input' },
-        React.createElement('input', { type: 'text', className: 'chat-input-box', id: 'inputMessage', placeholder: 'Say something!' })
+        React.createElement('input', { type: 'text', className: 'chat-input-box',
+          id: 'inputMessage',
+          placeholder: 'Say something!',
+          onKeyDown: this.handleKeyDown })
       );
     }
   });
@@ -30886,7 +30934,7 @@ module.exports = function (domElem) {
   ReactDOM.render(React.createElement(Chat, null), domElem);
 };
 
-},{"react":174,"react-dom":29}],176:[function(require,module,exports){
+},{"jquery":27,"react":174,"react-dom":29}],176:[function(require,module,exports){
 'use strict';
 
 var $ = require('jquery');

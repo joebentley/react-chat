@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 
 const chat = require('./routes/index')
 const promptUsername = require('./routes/promptUsername')
+const api = require('./routes/api')
 
 const app = express()
 
@@ -26,6 +27,7 @@ app.use('/static', express.static(path.join(__dirname, '/public')))
 
 app.use('/', chat)
 app.use('/promptUsername', promptUsername)
+app.use('/api', api)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
