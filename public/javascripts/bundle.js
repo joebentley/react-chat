@@ -30781,7 +30781,7 @@ var $ = require('jquery');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-module.exports = function () {
+module.exports = function (domElem) {
   var Chat = React.createClass({
     displayName: 'Chat',
 
@@ -30867,15 +30867,22 @@ module.exports = function () {
     }
   });
 
-  ReactDOM.render(React.createElement(Chat, null), $('#chatContainer')[0]);
+  ReactDOM.render(React.createElement(Chat, null), domElem);
 };
 
 },{"jquery":27,"react":174,"react-dom":29}],176:[function(require,module,exports){
 'use strict';
 
-require('./chat.jsx')();
+var $ = require('jquery');
+var chat = require('./chat.jsx');
 
-},{"./chat.jsx":175}],177:[function(require,module,exports){
+$(function () {
+  if ($('#chatContainer').length > 0) {
+    chat($('#chatContainer')[0]);
+  }
+});
+
+},{"./chat.jsx":175,"jquery":27}],177:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 

@@ -2,7 +2,7 @@ const $ = require('jquery')
 const React = require('react')
 const ReactDOM = require('react-dom')
 
-module.exports = function () {
+module.exports = function (domElem) {
   let Chat = React.createClass({
     render: function () {
       return (
@@ -68,5 +68,5 @@ module.exports = function () {
     }
   })
 
-  ReactDOM.render(<Chat />, $('#chatContainer')[0])
+  ReactDOM.render(<Chat />, domElem)
 }
