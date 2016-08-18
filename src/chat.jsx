@@ -1,4 +1,3 @@
-const $ = require('jquery')
 const React = require('react')
 const ReactDOM = require('react-dom')
 
@@ -6,7 +5,7 @@ module.exports = function (domElem) {
   let Chat = React.createClass({
     render: function () {
       return (
-        <div className="row panel panel-default chat-app">
+        <div className="row panel panel-default chat-app row-eq-height">
           <ChannelList />
           <ChatArea />
         </div>
@@ -29,6 +28,9 @@ module.exports = function (domElem) {
       return (
         <div className="col-xs-9 panel-body">
           <MessageList />
+          <div className="row bottom chat-input-container">
+            <InputBox />
+          </div>
         </div>
       )
     }
@@ -63,6 +65,16 @@ module.exports = function (domElem) {
         <div className="row chat-message">
           <div><strong>{this.props.name}</strong></div>
           <div>{this.props.text}</div>
+        </div>
+      )
+    }
+  })
+
+  let InputBox = React.createClass({
+    render: function () {
+      return (
+        <div className="chat-input">
+          <input type="text" className="chat-input-box" id="inputMessage" placeholder="Say something!"/>
         </div>
       )
     }

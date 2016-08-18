@@ -30777,7 +30777,6 @@ module.exports = require('./lib/React');
 },{"./lib/React":55}],175:[function(require,module,exports){
 'use strict';
 
-var $ = require('jquery');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -30788,7 +30787,7 @@ module.exports = function (domElem) {
     render: function render() {
       return React.createElement(
         'div',
-        { className: 'row panel panel-default chat-app' },
+        { className: 'row panel panel-default chat-app row-eq-height' },
         React.createElement(ChannelList, null),
         React.createElement(ChatArea, null)
       );
@@ -30814,7 +30813,12 @@ module.exports = function (domElem) {
       return React.createElement(
         'div',
         { className: 'col-xs-9 panel-body' },
-        React.createElement(MessageList, null)
+        React.createElement(MessageList, null),
+        React.createElement(
+          'div',
+          { className: 'row bottom chat-input-container' },
+          React.createElement(InputBox, null)
+        )
       );
     }
   });
@@ -30867,10 +30871,22 @@ module.exports = function (domElem) {
     }
   });
 
+  var InputBox = React.createClass({
+    displayName: 'InputBox',
+
+    render: function render() {
+      return React.createElement(
+        'div',
+        { className: 'chat-input' },
+        React.createElement('input', { type: 'text', className: 'chat-input-box', id: 'inputMessage', placeholder: 'Say something!' })
+      );
+    }
+  });
+
   ReactDOM.render(React.createElement(Chat, null), domElem);
 };
 
-},{"jquery":27,"react":174,"react-dom":29}],176:[function(require,module,exports){
+},{"react":174,"react-dom":29}],176:[function(require,module,exports){
 'use strict';
 
 var $ = require('jquery');

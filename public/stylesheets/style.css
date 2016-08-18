@@ -9,6 +9,19 @@ body {
   }
 }
 
+.bottom {
+    position: absolute;
+    bottom: 0;
+    margin-right: 0;
+}
+
+.row-eq-height {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
 .chat-app {
   overflow: hidden;
   height: 80vh;
@@ -31,4 +44,22 @@ body {
 
 .chat-message {
   margin: 1em auto;
+}
+
+.chat-input {
+  border: 2px solid #aaa;
+  border-radius: 3px;
+  width: 96%;
+  margin: 1em auto;
+  padding: 0.7em 1em;
+}
+
+.chat-input-container {
+  width: 100%;
+}
+
+.chat-input-box {
+  outline: none;
+  border: none;
+  width: 100%;
 }
