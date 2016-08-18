@@ -2,6 +2,10 @@ const path = require('path')
 const express = require('express')
 const session = require('express-session')
 const logger = require('morgan')
+const bodyParser = require('body-parser')
+
+const chat = require('./routes/index')
+const promptUsername = require('./routes/promptUsername')
 
 const app = express()
 
@@ -12,23 +16,16 @@ app.use(logger('dev'))
 app.use(session({
   secret: 'changeme',
   resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 60000 }
+  saveUninitialized: false
 }))
 
-app.get('/', function (req, res) {
-  if (req.session.username === undefined) {
-    res.redirect('promptUsername')
-  } else {
-    res.render('index')
-  }
-})
-
-app.get('/promptUsername', function (req, res, next) {
-  res.render('prompt')
-})
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 app.use('/static', express.static(path.join(__dirname, '/public')))
+
+app.use('/', chat)
+app.use('/promptUsername', promptUsername)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
