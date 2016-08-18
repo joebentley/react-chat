@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify src/main.js -o 'node_modules/.bin/exorcist public/bundle.js.map > public/javascripts/bundle.js' -t [ babelify --presets [ es2015 react ] ] -d",
-    "start": "node_modules/.bin/nodemon index.js"
+    "start": "PORT=8080 node_modules/.bin/nodemon ./bin/www"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "jquery": "^3.1.0",
+    "morgan": "^1.7.0",
     "react": "^15.3.0",
     "react-dom": "^15.3.0"
   },
@@ -35,6 +36,7 @@
     "eslint-plugin-promise": "^2.0.1",
     "eslint-plugin-react": "^6.1.1",
     "eslint-plugin-standard": "^2.0.0",
-    "exorcist": "^0.4.0"
+    "exorcist": "^0.4.0",
+    "nodemon": "^1.10.1"
   }
 }
