@@ -30830,25 +30830,23 @@ module.exports = function (domElem) {
     },
 
     getInitialState: function getInitialState() {
-      var username = void 0;
+      return { username: '', data: [] };
+    },
 
+    componentDidMount: function componentDidMount() {
       // Get username from server
       $.ajax({
         url: '/api/username',
         dataType: 'json',
-        success: function success(data) {
-          username = data.username;
-        },
+        success: function (data) {
+          this.setState({ username: data.username });
+        }.bind(this),
         error: function error(xhr, status, err) {
           console.error('/api/username', status, err.toString());
           throw new Error('Could not get username from server');
         }
       });
 
-      return { username: username, data: [] };
-    },
-
-    componentDidMount: function componentDidMount() {
       this.loadMessagesFromServer();
       setInterval(this.loadMessagesFromServer, this.props.pollInterval);
     },
@@ -30947,6 +30945,7 @@ module.exports = function (domElem) {
     handleKeyDown: function handleKeyDown(e) {
       if (e.keyCode === 13) {
         this.props.onMessageSubmit(e.target.value);
+        e.target.value = '';
       }
     },
 

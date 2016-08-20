@@ -45,25 +45,23 @@ module.exports = function (domElem) {
     },
 
     getInitialState: function () {
-      let username
+      return { username: '', data: [] }
+    },
 
+    componentDidMount: function () {
       // Get username from server
       $.ajax({
         url: '/api/username',
         dataType: 'json',
         success: function (data) {
-          username = data.username
-        },
+          this.setState({username: data.username})
+        }.bind(this),
         error: function (xhr, status, err) {
           console.error('/api/username', status, err.toString())
           throw new Error('Could not get username from server')
         }
       })
 
-      return ({ username: username, data: [] })
-    },
-
-    componentDidMount: function () {
       this.loadMessagesFromServer()
       setInterval(this.loadMessagesFromServer, this.props.pollInterval)
     },
@@ -144,6 +142,7 @@ module.exports = function (domElem) {
     handleKeyDown: function (e) {
       if (e.keyCode === 13) {
         this.props.onMessageSubmit(e.target.value)
+        e.target.value = ''
       }
     },
 
