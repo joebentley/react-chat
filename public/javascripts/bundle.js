@@ -30943,8 +30943,8 @@ module.exports = function (domElem) {
     },
 
     handleKeyDown: function handleKeyDown(e) {
-      if (e.keyCode === 13) {
-        this.props.onMessageSubmit(e.target.value);
+      if (e.keyCode === 13 && e.target.value.trim() !== '') {
+        this.props.onMessageSubmit(e.target.value.trim());
         e.target.value = '';
       }
     },

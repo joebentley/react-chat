@@ -140,8 +140,8 @@ module.exports = function (domElem) {
     },
 
     handleKeyDown: function (e) {
-      if (e.keyCode === 13) {
-        this.props.onMessageSubmit(e.target.value)
+      if (e.keyCode === 13 && e.target.value.trim() !== '') {
+        this.props.onMessageSubmit(e.target.value.trim())
         e.target.value = ''
       }
     },
@@ -152,7 +152,7 @@ module.exports = function (domElem) {
           <input type="text" className="chat-input-box"
             id="inputMessage"
             placeholder="Say something!"
-            onKeyDown={this.handleKeyDown} />
+            onKeyDown={this.handleKeyDown}></input>
         </div>
       )
     }

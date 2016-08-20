@@ -51,7 +51,6 @@ body {
   border-radius: 3px;
   width: 96%;
   margin: 1em auto;
-  padding: 0.7em 1em;
 }
 
 .chat-input-container {
@@ -62,4 +61,7 @@ body {
   outline: none;
   border: none;
   width: 100%;
+  height: 2.6em;
+  resize: none;
+  padding: 0.7em 1em;
 }
