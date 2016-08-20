@@ -22,4 +22,13 @@ router.post('/messages', function (req, res, next) {
   res.send(message)
 })
 
+router.get('/username', function (req, res, next) {
+  // Redirect to username page if they don't have a session
+  if (req.session.username === undefined) {
+    res.redirect('promptUsername')
+  }
+
+  res.send({ username: req.session.username })
+})
+
 module.exports = router

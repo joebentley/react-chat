@@ -30790,7 +30790,7 @@ module.exports = function (domElem) {
         'div',
         { className: 'row panel panel-default chat-app row-eq-height' },
         React.createElement(ChannelList, null),
-        React.createElement(ChatArea, { url: '/api/messages', pollInterval: 3000 })
+        React.createElement(ChatArea, { pollInterval: 3000 })
       );
     }
   });
@@ -30810,27 +30810,42 @@ module.exports = function (domElem) {
   var ChatArea = React.createClass({
     displayName: 'ChatArea',
 
+
     propTypes: {
-      url: React.PropTypes.string,
       pollInterval: React.PropTypes.number
     },
 
     loadMessagesFromServer: function loadMessagesFromServer() {
       $.ajax({
-        url: this.props.url,
+        url: '/api/messages',
         dataType: 'json',
         cache: false,
         success: function (data) {
           this.setState({ data: data });
         }.bind(this),
-        error: function (xhr, status, err) {
-          console.error(this.props.url, status, err.toString());
-        }.bind(this)
+        error: function error(xhr, status, err) {
+          console.error('/api/messages', status, err.toString());
+        }
       });
     },
 
     getInitialState: function getInitialState() {
-      return { data: [] };
+      var username = void 0;
+
+      // Get username from server
+      $.ajax({
+        url: '/api/username',
+        dataType: 'json',
+        success: function success(data) {
+          username = data.username;
+        },
+        error: function error(xhr, status, err) {
+          console.error('/api/username', status, err.toString());
+          throw new Error('Could not get username from server');
+        }
+      });
+
+      return { username: username, data: [] };
     },
 
     componentDidMount: function componentDidMount() {
@@ -30839,13 +30854,22 @@ module.exports = function (domElem) {
     },
 
     handleSubmit: function handleSubmit(message) {
+      // Optimistically post the message immediately
+      this.state.data.push({
+        id: this.state.data.length,
+        name: this.state.username,
+        text: message
+      });
+      this.forceUpdate();
+
+      // Send to server
       $.ajax({
-        url: this.props.url,
+        url: '/api/messages',
         data: { message: message },
         method: 'POST',
-        error: function (xhr, status, err) {
-          console.error(this.props.url, status, err.toString());
-        }.bind(this)
+        error: function error(xhr, status, err) {
+          console.error('/api/messages', status, err.toString());
+        }
       });
     },
 
