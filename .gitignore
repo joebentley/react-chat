@@ -1,3 +1,6 @@
+# Sourcemaps
+*.map
+
 # Logs
 logs
 *.log
