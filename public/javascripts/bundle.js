@@ -38066,7 +38066,6 @@ module.exports = function (domElem) {
   var ChatArea = React.createClass({
     displayName: 'ChatArea',
 
-
     propTypes: {
       pollInterval: React.PropTypes.number
     },
@@ -38126,6 +38125,11 @@ module.exports = function (domElem) {
       data: React.PropTypes.array
     },
 
+    componentDidUpdate: function componentDidUpdate() {
+      // Scroll to bottom of messages
+      $('#messageList').scrollTop($('#messageList')[0].scrollHeight);
+    },
+
     render: function render() {
       var messages = this.props.data.map(function (message) {
         return React.createElement(Message, { key: message.id, name: message.name, text: message.text });
@@ -38133,7 +38137,7 @@ module.exports = function (domElem) {
 
       return React.createElement(
         'div',
-        null,
+        { id: 'messageList', className: 'chat-message-list' },
         messages
       );
     }

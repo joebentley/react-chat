@@ -34,6 +34,11 @@ body {
   margin-bottom: -100%;
 }
 
+.chat-message-list {
+  overflow: auto;
+  height: 70vh;
+}
+
 .chat-message:first-child {
   margin: 0 auto 1em;
 }

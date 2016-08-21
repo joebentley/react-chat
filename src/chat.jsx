@@ -26,7 +26,6 @@ module.exports = function (domElem) {
   })
 
   let ChatArea = React.createClass({
-
     propTypes: {
       pollInterval: React.PropTypes.number
     },
@@ -80,6 +79,11 @@ module.exports = function (domElem) {
       data: React.PropTypes.array
     },
 
+    componentDidUpdate: function () {
+      // Scroll to bottom of messages
+      $('#messageList').scrollTop($('#messageList')[0].scrollHeight)
+    },
+
     render: function () {
       var messages = this.props.data.map(function (message) {
         return (
@@ -88,7 +92,7 @@ module.exports = function (domElem) {
       })
 
       return (
-        <div>
+        <div id="messageList" className="chat-message-list">
           {messages}
         </div>
       )
