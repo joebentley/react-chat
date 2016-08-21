@@ -1,6 +1,7 @@
 const $ = require('jquery')
 const React = require('react')
 const ReactDOM = require('react-dom')
+const socket = require('socket.io-client')()
 
 module.exports = function (domElem) {
   let Chat = React.createClass({
@@ -30,40 +31,23 @@ module.exports = function (domElem) {
       pollInterval: React.PropTypes.number
     },
 
-    loadMessagesFromServer: function () {
-      $.ajax({
-        url: '/api/messages',
-        dataType: 'json',
-        cache: false,
-        success: function (data) {
-          this.setState({data: data})
-        }.bind(this),
-        error: function (xhr, status, err) {
-          console.error('/api/messages', status, err.toString())
-        }
-      })
-    },
-
     getInitialState: function () {
       return { username: '', data: [] }
     },
 
     componentDidMount: function () {
-      // Get username from server
-      $.ajax({
-        url: '/api/username',
-        dataType: 'json',
-        success: function (data) {
-          this.setState({username: data.username})
-        }.bind(this),
-        error: function (xhr, status, err) {
-          console.error('/api/username', status, err.toString())
-          throw new Error('Could not get username from server')
-        }
+      socket.on('username', (username) => {
+        this.setState({username})
       })
 
-      this.loadMessagesFromServer()
-      setInterval(this.loadMessagesFromServer, this.props.pollInterval)
+      socket.on('messages', (data) => {
+        this.setState({data})
+      })
+
+      socket.on('connect', function () {
+        socket.emit('getUsername')
+        socket.emit('getMessages')
+      })
     },
 
     handleSubmit: function (message) {
@@ -76,14 +60,7 @@ module.exports = function (domElem) {
       this.forceUpdate()
 
       // Send to server
-      $.ajax({
-        url: '/api/messages',
-        data: {message: message},
-        method: 'POST',
-        error: function (xhr, status, err) {
-          console.error('/api/messages', status, err.toString())
-        }
-      })
+      socket.emit('newMessage', message)
     },
 
     render: function () {
