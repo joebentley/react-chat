@@ -41,7 +41,7 @@ exports.listenSocket = function (io) {
     })
 
     socket.on('getMessages', function () {
-      socket.emit('messages', data)
+      io.sockets.emit('messages', data)
     })
 
     socket.on('newMessage', function (message) {
@@ -54,7 +54,7 @@ exports.listenSocket = function (io) {
 
       console.log(data)
 
-      socket.emit('messages', data)
+      io.sockets.emit('messages', data)
     })
   })
 }
