@@ -38082,7 +38082,7 @@ module.exports = function (domElem) {
       });
 
       socket.on('messages', function (data) {
-        _this.setState({ data: data });
+        _this.setState({ data: data.map(JSON.parse) });
       });
 
       socket.on('connect', function () {

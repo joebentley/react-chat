@@ -40,7 +40,7 @@ module.exports = function (domElem) {
       })
 
       socket.on('messages', (data) => {
-        this.setState({data})
+        this.setState({ data: data.map(JSON.parse) })
       })
 
       socket.on('connect', function () {

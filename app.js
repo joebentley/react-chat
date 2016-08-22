@@ -43,7 +43,6 @@ app.use(function (req, res, next) {
 
 app.use('/', chat)
 app.use('/promptUsername', promptUsername)
-app.use('/api', api.router)
 
 // Setup socket IO API listeners
 api.listenSocket(io)

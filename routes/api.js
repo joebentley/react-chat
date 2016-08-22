@@ -1,37 +1,4 @@
-const express = require('express')
-const router = express.Router()
-
-
-let data = [ { id: 0, name: 'joe', text: 'hello marie!' },
-             { id: 1, name: 'marie', text: 'hey joe' } ]
-
-router.get('/messages', function (req, res, next) {
-  res.send(data)
-})
-
-router.post('/messages', function (req, res, next) {
-  // Redirect to username page if they don't have a session
-  if (req.session.username === undefined) {
-    res.redirect('/promptUsername')
-  }
-
-  let message = { id: data.length, name: req.session.username, text: req.body.message }
-
-  data.push(message)
-
-  res.send(message)
-})
-
-router.get('/username', function (req, res, next) {
-  // Redirect to username page if they don't have a session
-  if (req.session.username === undefined) {
-    res.redirect('/promptUsername')
-  }
-
-  res.send({ username: req.session.username })
-})
-
-exports.router = router
+const client = require('redis').createClient()
 
 // Setup socket IO listeners
 exports.listenSocket = function (io) {
@@ -41,20 +8,48 @@ exports.listenSocket = function (io) {
     })
 
     socket.on('getMessages', function () {
-      io.sockets.emit('messages', data)
+      client.lrange('messages', 0, -1, function (err, data) {
+        if (err) {
+          throw new Error('Could not get messages')
+        }
+
+        if (data === null) {
+          data = []
+        }
+        io.sockets.emit('messages', data)
+      })
     })
 
     socket.on('newMessage', function (message) {
-      let newMessage = {
-        id: data.length,
-        name: socket.handshake.session.username,
-        text: message
-      }
-      data.push(newMessage)
+      client.get('messages:nextid', function (err, id) {
+        if (err) {
+          throw new Error('Could not get next ID')
+        }
 
-      console.log(data)
+        // If the new ID is null, i.e. the key doesn't exist, set it to zero
+        if (id === null) {
+          client.set('messages:nextid', 0)
+          id = '0'
+        }
 
-      io.sockets.emit('messages', data)
+        let newMessage = {
+          id: id,
+          name: socket.handshake.session.username,
+          text: message
+        }
+
+        client.rpush('messages', JSON.stringify(newMessage), function () {
+          client.lrange('messages', 0, -1, function (err, data) {
+            if (err) {
+              throw new Error('Could not get messages')
+            }
+
+            io.sockets.emit('messages', data)
+          })
+        })
+
+        client.incr('messages:nextid')
+      })
     })
   })
 }

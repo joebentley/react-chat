@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "watchify src/main.js -o 'node_modules/.bin/exorcist public/bundle.js.map > public/javascripts/bundle.js' -t [ babelify --presets [ es2015 react ] ] -d",
-    "start": "node ./bin/www"
+    "watch": "watchify src/main.js -o 'node_modules/.bin/exorcist public/javascripts/bundle.js.map > public/javascripts/bundle.js' -t [ babelify --presets [ es2015 react ] ] -d",
+    "start": "node ./bin/www",
+    "redis": "redis-server"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "morgan": "^1.7.0",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
+    "redis": "^2.6.2",
     "socket.io": "^1.4.8",
     "socket.io-client": "^1.4.8"
   },
