@@ -11,12 +11,19 @@ const api = require('./routes/api')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
+const redisClient = require('redis').createClient(process.env.REDIS_URL)
+
+const expressSession = require('express-session')
+const RedisStore = require('connect-redis')(expressSession)
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
 // Setup session middleware
-const session = require('express-session')({
+const session = expressSession({
+  store: new RedisStore({
+    client: redisClient
+  }),
   secret: 'changeme',
   resave: false,
   saveUninitialized: false
@@ -45,7 +52,7 @@ app.use('/', chat)
 app.use('/promptUsername', promptUsername)
 
 // Setup socket IO API listeners
-api.listenSocket(io)
+api.listenSocket(io, redisClient)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

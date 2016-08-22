@@ -1,14 +1,13 @@
-const client = require('redis').createClient(process.env.REDIS_URL)
 
 // Setup socket IO listeners
-exports.listenSocket = function (io) {
+exports.listenSocket = function (io, redisClient) {
   io.on('connection', function (socket) {
     socket.on('getUsername', function () {
       socket.emit('username', socket.handshake.session.username)
     })
 
     socket.on('getMessages', function () {
-      client.lrange('messages', 0, -1, function (err, data) {
+      redisClient.lrange('messages', 0, -1, function (err, data) {
         if (err) {
           throw new Error('Could not get messages')
         }
@@ -21,14 +20,14 @@ exports.listenSocket = function (io) {
     })
 
     socket.on('newMessage', function (message) {
-      client.get('messages:nextid', function (err, id) {
+      redisClient.get('messages:nextid', function (err, id) {
         if (err) {
           throw new Error('Could not get next ID')
         }
 
         // If the new ID is null, i.e. the key doesn't exist, set it to zero
         if (id === null) {
-          client.set('messages:nextid', 0)
+          redisClient.set('messages:nextid', 0)
           id = '0'
         }
 
@@ -38,8 +37,8 @@ exports.listenSocket = function (io) {
           text: message
         }
 
-        client.rpush('messages', JSON.stringify(newMessage), function () {
-          client.lrange('messages', 0, -1, function (err, data) {
+        redisClient.rpush('messages', JSON.stringify(newMessage), function () {
+          redisClient.lrange('messages', 0, -1, function (err, data) {
             if (err) {
               throw new Error('Could not get messages')
             }
@@ -48,7 +47,7 @@ exports.listenSocket = function (io) {
           })
         })
 
-        client.incr('messages:nextid')
+        redisClient.incr('messages:nextid')
       })
     })
   })
