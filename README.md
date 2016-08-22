@@ -25,12 +25,21 @@ $ ./watch.sh
 
 * ~~Working multi-user chat app~~
 
-* Channel list and switchable channels (e.g. Slack)
+* Backend stuff
 
-* Emoji
+  * Model for handling users
+  
 
-* Username validation
+* Login page
+  
+  * Javascript username validation
+  * Authentication
+  
 
-* Authentication
+* Chat improvements
+
+  * Make links hyperlinks
+  * Emoji
+  * Channel list and switchable channels (e.g. Slack)
 
 * Chrome desktop notifications
