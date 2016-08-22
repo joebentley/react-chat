@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "6.3.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify src/main.js -o 'node_modules/.bin/exorcist public/javascripts/bundle.js.map > public/javascripts/bundle.js' -t [ babelify --presets [ es2015 react ] ] -d",
