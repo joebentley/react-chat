@@ -1,4 +1,4 @@
-const client = require('redis').createClient()
+const client = require('redis').createClient(process.env.REDIS_URL)
 
 // Setup socket IO listeners
 exports.listenSocket = function (io) {
