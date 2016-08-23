@@ -20,19 +20,19 @@ exports.listenSocket = function (io, redisClient) {
     })
 
     socket.on('newMessage', function (message) {
-      redisClient.get('messages:nextid', function (err, id) {
+      redisClient.llen('messages', function (err, length) {
         if (err) {
-          throw new Error('Could not get next ID')
+          throw new Error('Could not get length of list')
         }
 
-        // If the new ID is null, i.e. the key doesn't exist, set it to zero
-        if (id === null) {
-          redisClient.set('messages:nextid', 0)
-          id = '0'
-        }
+        // // If the new ID is null, i.e. the key doesn't exist, set it to zero
+        // if (id === null) {
+        //   redisClient.set('messages:nextid', 0)
+        //   id = '0'
+        // }
 
         let newMessage = {
-          id: id,
+          id: length,
           name: socket.handshake.session.username,
           text: message
         }
@@ -46,8 +46,6 @@ exports.listenSocket = function (io, redisClient) {
             io.sockets.emit('messages', data)
           })
         })
-
-        redisClient.incr('messages:nextid')
       })
     })
   })
