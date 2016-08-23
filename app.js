@@ -42,11 +42,9 @@ io.use(sharedSession(session, {
   autoSave: true
 }))
 
-// Add socket reference to response
-app.use(function (req, res, next) {
-  res.io = io
-  next()
-})
+// Add reference to socket and redis to app
+app.set('socketIO', io)
+app.set('redisClient', redisClient)
 
 app.use('/', chat)
 app.use('/promptUsername', promptUsername)
