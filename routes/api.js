@@ -25,12 +25,6 @@ exports.listenSocket = function (io, redisClient) {
           throw new Error('Could not get length of list')
         }
 
-        // // If the new ID is null, i.e. the key doesn't exist, set it to zero
-        // if (id === null) {
-        //   redisClient.set('messages:nextid', 0)
-        //   id = '0'
-        // }
-
         let newMessage = {
           id: length,
           name: socket.handshake.session.username,
@@ -47,6 +41,12 @@ exports.listenSocket = function (io, redisClient) {
           })
         })
       })
+    })
+
+    socket.on('getChannels', function () {
+      let channels = ['#general', '#random', '#images']
+
+      socket.emit('channels', channels)
     })
   })
 }

@@ -16,10 +16,38 @@ module.exports = function (domElem) {
   })
 
   let ChannelList = React.createClass({
+    constructOnClickHandler: function () {
+      return (e) => {
+        $('.channel').removeClass('channel-clicked')
+        $(e.target).addClass('channel-clicked')
+      }
+    },
+
+    getInitialState: function () {
+      return { channels: [] }
+    },
+
+    componentDidMount: function () {
+      socket.emit('getChannels')
+
+      socket.on('channels', (channels) => {
+        this.setState({channels})
+      })
+    },
+
     render: function () {
+      let channels = this.state.channels.map((channel, i) => {
+        return (
+          <span key={i}>
+            <a className="channel" onClick={this.constructOnClickHandler()}
+               href={channel}>{channel}</a><br />
+          </span>
+        )
+      })
+
       return (
         <div className="col-xs-3 panel-body channel-list">
-          Hello
+          {channels}
         </div>
       )
     }
@@ -52,7 +80,6 @@ module.exports = function (domElem) {
     handleSubmit: function (message) {
       // Optimistically post the message immediately
       this.state.data.push({
-        id: this.state.data.length,
         name: this.state.username,
         text: message
       })
@@ -85,9 +112,9 @@ module.exports = function (domElem) {
     },
 
     render: function () {
-      var messages = this.props.data.map(function (message) {
+      let messages = this.props.data.map(function (message, i) {
         return (
-          <Message key={message.id} name={message.name} text={message.text} />
+          <Message key={i} name={message.name} text={message.text} />
         )
       })
 

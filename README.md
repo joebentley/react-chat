@@ -40,6 +40,12 @@ $ ./watch.sh
 
   * Make links hyperlinks
   * Emoji
-  * Channel list and switchable channels (e.g. Slack)
+  * Embedded images
+
+* Channels
+
+  * Clickable channel list
+  * Switchable channels (e.g. Slack)
+
 
 * Chrome desktop notifications

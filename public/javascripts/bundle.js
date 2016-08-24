@@ -38054,11 +38054,48 @@ module.exports = function (domElem) {
   var ChannelList = React.createClass({
     displayName: 'ChannelList',
 
+    constructOnClickHandler: function constructOnClickHandler() {
+      return function (e) {
+        $('.channel').removeClass('channel-clicked');
+        $(e.target).addClass('channel-clicked');
+      };
+    },
+
+    getInitialState: function getInitialState() {
+      return { channels: [] };
+    },
+
+    componentDidMount: function componentDidMount() {
+      var _this = this;
+
+      socket.emit('getChannels');
+
+      socket.on('channels', function (channels) {
+        _this.setState({ channels: channels });
+      });
+    },
+
     render: function render() {
+      var _this2 = this;
+
+      var channels = this.state.channels.map(function (channel, i) {
+        return React.createElement(
+          'span',
+          { key: i },
+          React.createElement(
+            'a',
+            { className: 'channel', onClick: _this2.constructOnClickHandler(),
+              href: channel },
+            channel
+          ),
+          React.createElement('br', null)
+        );
+      });
+
       return React.createElement(
         'div',
         { className: 'col-xs-3 panel-body channel-list' },
-        'Hello'
+        channels
       );
     }
   });
@@ -38075,14 +38112,14 @@ module.exports = function (domElem) {
     },
 
     componentDidMount: function componentDidMount() {
-      var _this = this;
+      var _this3 = this;
 
       socket.on('username', function (username) {
-        _this.setState({ username: username });
+        _this3.setState({ username: username });
       });
 
       socket.on('messages', function (data) {
-        _this.setState({ data: data.map(JSON.parse) });
+        _this3.setState({ data: data.map(JSON.parse) });
       });
 
       socket.on('connect', function () {
@@ -38094,7 +38131,6 @@ module.exports = function (domElem) {
     handleSubmit: function handleSubmit(message) {
       // Optimistically post the message immediately
       this.state.data.push({
-        id: this.state.data.length,
         name: this.state.username,
         text: message
       });
@@ -38131,8 +38167,8 @@ module.exports = function (domElem) {
     },
 
     render: function render() {
-      var messages = this.props.data.map(function (message) {
-        return React.createElement(Message, { key: message.id, name: message.name, text: message.text });
+      var messages = this.props.data.map(function (message, i) {
+        return React.createElement(Message, { key: i, name: message.name, text: message.text });
       });
 
       return React.createElement(

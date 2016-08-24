@@ -34,6 +34,14 @@ body {
   margin-bottom: -100%;
 }
 
+.channel:hover, .channel:visited, .channel:link, .channel:active {
+  text-decoration: none;
+}
+
+.channel-clicked {
+  color: #FF0000 !important;
+}
+
 .chat-message-list {
   overflow: auto;
   height: 70vh;
