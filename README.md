@@ -44,7 +44,7 @@ $ ./watch.sh
 
 * Channels
 
-  * Clickable channel list
+  * ~~Clickable channel list~~
   * Switchable channels (e.g. Slack)
 
 
