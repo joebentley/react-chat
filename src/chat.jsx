@@ -5,59 +5,6 @@ const socket = require('socket.io-client')()
 
 module.exports = function (domElem) {
   let Chat = React.createClass({
-    render: function () {
-      return (
-        <div className="row panel panel-default chat-app row-eq-height">
-          <ChannelList />
-          <ChatArea pollInterval={3000} />
-        </div>
-      )
-    }
-  })
-
-  let ChannelList = React.createClass({
-    constructOnClickHandler: function () {
-      return (e) => {
-        $('.channel').removeClass('channel-clicked')
-        $(e.target).addClass('channel-clicked')
-      }
-    },
-
-    getInitialState: function () {
-      return { channels: [] }
-    },
-
-    componentDidMount: function () {
-      socket.emit('getChannels')
-
-      socket.on('channels', (channels) => {
-        this.setState({channels})
-      })
-    },
-
-    render: function () {
-      let channels = this.state.channels.map((channel, i) => {
-        return (
-          <span key={i}>
-            <a className="channel" onClick={this.constructOnClickHandler()}
-               href={channel}>{channel}</a><br />
-          </span>
-        )
-      })
-
-      return (
-        <div className="col-xs-3 panel-body channel-list">
-          {channels}
-        </div>
-      )
-    }
-  })
-
-  let ChatArea = React.createClass({
-    propTypes: {
-      pollInterval: React.PropTypes.number
-    },
-
     getInitialState: function () {
       return { username: '', data: [] }
     },
@@ -89,13 +36,70 @@ module.exports = function (domElem) {
       socket.emit('newMessage', message)
     },
 
+    handleChannelSwitch: function (newChannel) {
+      socket.emit('getMessages')
+    },
+
     render: function () {
       return (
-        <div className="col-xs-9 panel-body">
-          <MessageList data={this.state.data} />
-          <div className="row bottom chat-input-container">
-            <InputBox onMessageSubmit={this.handleSubmit}/>
+        <div className="row panel panel-default chat-app row-eq-height">
+          <ChannelList onChannelSwitch={this.handleChannelSwitch} />
+          <div className="col-xs-9 panel-body">
+            <MessageList data={this.state.data} />
+            <div className="row bottom chat-input-container">
+              <InputBox onMessageSubmit={this.handleSubmit}/>
+            </div>
           </div>
+        </div>
+      )
+    }
+  })
+
+  let ChannelList = React.createClass({
+    propTypes: {
+      onChannelSwitch: React.PropTypes.func
+    },
+
+    channelSwitchHandler: function (newChannel) {
+      socket.emit('switchChannel', newChannel)
+
+      this.props.onChannelSwitch(newChannel)
+    },
+
+    constructOnClickHandler: function () {
+      return (e) => {
+        $('.channel').removeClass('channel-clicked')
+        $(e.target).addClass('channel-clicked')
+
+        this.channelSwitchHandler(e.target.text)
+      }
+    },
+
+    getInitialState: function () {
+      return { channels: [] }
+    },
+
+    componentDidMount: function () {
+      socket.emit('getChannels')
+
+      socket.on('channels', (channels) => {
+        this.setState({channels})
+      })
+    },
+
+    render: function () {
+      let channels = this.state.channels.map((channel, i) => {
+        return (
+          <span key={i}>
+            <a className="channel" onClick={this.constructOnClickHandler()}
+               href={channel}>{channel}</a><br />
+          </span>
+        )
+      })
+
+      return (
+        <div className="col-xs-3 panel-body channel-list">
+          {channels}
         </div>
       )
     }

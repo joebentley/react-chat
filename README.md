@@ -27,7 +27,9 @@ $ ./watch.sh
 
 * Backend stuff
 
-  * Model for handling users
+  * ~~Model for handling users~~
+
+  * Move users and messages from API into separate models
   
 
 * Login page

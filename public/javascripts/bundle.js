@@ -38041,85 +38041,19 @@ module.exports = function (domElem) {
   var Chat = React.createClass({
     displayName: 'Chat',
 
-    render: function render() {
-      return React.createElement(
-        'div',
-        { className: 'row panel panel-default chat-app row-eq-height' },
-        React.createElement(ChannelList, null),
-        React.createElement(ChatArea, { pollInterval: 3000 })
-      );
-    }
-  });
-
-  var ChannelList = React.createClass({
-    displayName: 'ChannelList',
-
-    constructOnClickHandler: function constructOnClickHandler() {
-      return function (e) {
-        $('.channel').removeClass('channel-clicked');
-        $(e.target).addClass('channel-clicked');
-      };
-    },
-
-    getInitialState: function getInitialState() {
-      return { channels: [] };
-    },
-
-    componentDidMount: function componentDidMount() {
-      var _this = this;
-
-      socket.emit('getChannels');
-
-      socket.on('channels', function (channels) {
-        _this.setState({ channels: channels });
-      });
-    },
-
-    render: function render() {
-      var _this2 = this;
-
-      var channels = this.state.channels.map(function (channel, i) {
-        return React.createElement(
-          'span',
-          { key: i },
-          React.createElement(
-            'a',
-            { className: 'channel', onClick: _this2.constructOnClickHandler(),
-              href: channel },
-            channel
-          ),
-          React.createElement('br', null)
-        );
-      });
-
-      return React.createElement(
-        'div',
-        { className: 'col-xs-3 panel-body channel-list' },
-        channels
-      );
-    }
-  });
-
-  var ChatArea = React.createClass({
-    displayName: 'ChatArea',
-
-    propTypes: {
-      pollInterval: React.PropTypes.number
-    },
-
     getInitialState: function getInitialState() {
       return { username: '', data: [] };
     },
 
     componentDidMount: function componentDidMount() {
-      var _this3 = this;
+      var _this = this;
 
       socket.on('username', function (username) {
-        _this3.setState({ username: username });
+        _this.setState({ username: username });
       });
 
       socket.on('messages', function (data) {
-        _this3.setState({ data: data.map(JSON.parse) });
+        _this.setState({ data: data.map(JSON.parse) });
       });
 
       socket.on('connect', function () {
@@ -38140,16 +38074,88 @@ module.exports = function (domElem) {
       socket.emit('newMessage', message);
     },
 
+    handleChannelSwitch: function handleChannelSwitch(newChannel) {
+      socket.emit('getMessages');
+    },
+
     render: function render() {
       return React.createElement(
         'div',
-        { className: 'col-xs-9 panel-body' },
-        React.createElement(MessageList, { data: this.state.data }),
+        { className: 'row panel panel-default chat-app row-eq-height' },
+        React.createElement(ChannelList, { onChannelSwitch: this.handleChannelSwitch }),
         React.createElement(
           'div',
-          { className: 'row bottom chat-input-container' },
-          React.createElement(InputBox, { onMessageSubmit: this.handleSubmit })
+          { className: 'col-xs-9 panel-body' },
+          React.createElement(MessageList, { data: this.state.data }),
+          React.createElement(
+            'div',
+            { className: 'row bottom chat-input-container' },
+            React.createElement(InputBox, { onMessageSubmit: this.handleSubmit })
+          )
         )
+      );
+    }
+  });
+
+  var ChannelList = React.createClass({
+    displayName: 'ChannelList',
+
+    propTypes: {
+      onChannelSwitch: React.PropTypes.func
+    },
+
+    channelSwitchHandler: function channelSwitchHandler(newChannel) {
+      socket.emit('switchChannel', newChannel);
+
+      this.props.onChannelSwitch(newChannel);
+    },
+
+    constructOnClickHandler: function constructOnClickHandler() {
+      var _this2 = this;
+
+      return function (e) {
+        $('.channel').removeClass('channel-clicked');
+        $(e.target).addClass('channel-clicked');
+
+        _this2.channelSwitchHandler(e.target.text);
+      };
+    },
+
+    getInitialState: function getInitialState() {
+      return { channels: [] };
+    },
+
+    componentDidMount: function componentDidMount() {
+      var _this3 = this;
+
+      socket.emit('getChannels');
+
+      socket.on('channels', function (channels) {
+        _this3.setState({ channels: channels });
+      });
+    },
+
+    render: function render() {
+      var _this4 = this;
+
+      var channels = this.state.channels.map(function (channel, i) {
+        return React.createElement(
+          'span',
+          { key: i },
+          React.createElement(
+            'a',
+            { className: 'channel', onClick: _this4.constructOnClickHandler(),
+              href: channel },
+            channel
+          ),
+          React.createElement('br', null)
+        );
+      });
+
+      return React.createElement(
+        'div',
+        { className: 'col-xs-3 panel-body channel-list' },
+        channels
       );
     }
   });
