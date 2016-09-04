@@ -1,17 +1,18 @@
+const Message = require('../models/message.js')
+const User = require('../models/user.js')
+
 
 // Setup socket IO listeners
 exports.listenSocket = function (io, redisClient) {
   io.on('connection', function (socket) {
     let username = socket.handshake.session.username
 
-    redisClient.hget('users', username, function (err, user) {
-      if (err) {
-        throw new Error('Could not get messages')
-      }
+    let users = User(redisClient)
+    let messages = Message(redisClient)
 
-      if (user !== null) {
-        user = JSON.parse(user)
-        socket.join(user.channel)
+    users.attachSocket(username, socket, function (err) {
+      if (err) {
+        throw err
       }
     })
 
@@ -20,66 +21,20 @@ exports.listenSocket = function (io, redisClient) {
     })
 
     socket.on('getMessages', function () {
-      redisClient.lrange('messages', 0, -1, function (err, data) {
+      messages.getMessages(username, function (err, messages) {
         if (err) {
-          throw new Error('Could not get messages')
+          throw err
         }
-
-        if (data === null) {
-          data = []
-        }
-
-        redisClient.hmget('users', username, function (err, user) {
-          if (err) {
-            throw new Error('Could not get users')
-          }
-
-          if (user !== null) {
-            user = JSON.parse(user)
-
-            io.to(user.channel).emit('messages', data.filter((message) => {
-              message = JSON.parse(message)
-              return message.channel === user.channel
-            }))
-          }
-        })
+        socket.emit('messages', messages)
       })
     })
 
     socket.on('newMessage', function (message) {
-      redisClient.hget('users', username, function (err, user) {
+      messages.newMessage(username, message, function (err, messages) {
         if (err) {
-          throw new Error('Could not get users')
+          throw err
         }
-
-        if (user !== null) {
-          user = JSON.parse(user)
-
-          redisClient.llen('messages', function (err, length) {
-            if (err) {
-              throw new Error('Could not get length of list')
-            }
-
-            let newMessage = {
-              id: length,
-              name: username,
-              text: message,
-              channel: user.channel
-            }
-
-            redisClient.rpush('messages', JSON.stringify(newMessage), function () {
-              redisClient.lrange('messages', 0, -1, function (err, data) {
-                if (err) {
-                  throw new Error('Could not get messages')
-                }
-
-                io.to(user.channel).emit('messages', data.filter((message) => {
-                  return message.channel === user.channel
-                }))
-              })
-            })
-          })
-        }
+        socket.emit('messages', messages)
       })
     })
 
