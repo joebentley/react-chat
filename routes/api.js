@@ -16,8 +16,13 @@ exports.listenSocket = function (io, redisClient) {
       }
     })
 
-    socket.on('getUsername', function () {
-      socket.emit('username', username)
+    socket.on('getUser', function () {
+      users.getUser(username, function (err, user) {
+        if (err) {
+          throw err
+        }
+        socket.emit('user', user)
+      })
     })
 
     socket.on('getMessages', function () {

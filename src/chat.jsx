@@ -10,16 +10,16 @@ module.exports = function (domElem) {
     },
 
     componentDidMount: function () {
-      socket.on('username', (username) => {
-        this.setState({username})
+      socket.on('user', (user) => {
+        this.setState({ user })
       })
 
       socket.on('messages', (data) => {
-        this.setState({ data: data.map(JSON.parse) })
+        this.setState({ data })
       })
 
       socket.on('connect', function () {
-        socket.emit('getUsername')
+        socket.emit('getUser')
         socket.emit('getMessages')
       })
     },
@@ -27,8 +27,8 @@ module.exports = function (domElem) {
     handleSubmit: function (message) {
       // Optimistically post the message immediately
       this.state.data.push({
-        name: this.state.username,
-        text: message
+        name: this.state.user.username,
+        message: message
       })
       this.forceUpdate()
 
@@ -37,6 +37,7 @@ module.exports = function (domElem) {
     },
 
     handleChannelSwitch: function (newChannel) {
+      socket.emit('getUser')
       socket.emit('getMessages')
     },
 
@@ -57,7 +58,8 @@ module.exports = function (domElem) {
 
   let ChannelList = React.createClass({
     propTypes: {
-      onChannelSwitch: React.PropTypes.func
+      onChannelSwitch: React.PropTypes.func,
+      initialChannel: React.PropTypes.string
     },
 
     channelSwitchHandler: function (newChannel) {
@@ -118,7 +120,7 @@ module.exports = function (domElem) {
     render: function () {
       let messages = this.props.data.map(function (message, i) {
         return (
-          <Message key={i} name={message.name} text={message.text} />
+          <Message key={i} name={message.name} text={message.message} />
         )
       })
 

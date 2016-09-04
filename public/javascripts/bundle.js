@@ -38048,16 +38048,16 @@ module.exports = function (domElem) {
     componentDidMount: function componentDidMount() {
       var _this = this;
 
-      socket.on('username', function (username) {
-        _this.setState({ username: username });
+      socket.on('user', function (user) {
+        _this.setState({ user: user });
       });
 
       socket.on('messages', function (data) {
-        _this.setState({ data: data.map(JSON.parse) });
+        _this.setState({ data: data });
       });
 
       socket.on('connect', function () {
-        socket.emit('getUsername');
+        socket.emit('getUser');
         socket.emit('getMessages');
       });
     },
@@ -38065,8 +38065,8 @@ module.exports = function (domElem) {
     handleSubmit: function handleSubmit(message) {
       // Optimistically post the message immediately
       this.state.data.push({
-        name: this.state.username,
-        text: message
+        name: this.state.user.username,
+        message: message
       });
       this.forceUpdate();
 
@@ -38075,6 +38075,7 @@ module.exports = function (domElem) {
     },
 
     handleChannelSwitch: function handleChannelSwitch(newChannel) {
+      socket.emit('getUser');
       socket.emit('getMessages');
     },
 
@@ -38101,7 +38102,8 @@ module.exports = function (domElem) {
     displayName: 'ChannelList',
 
     propTypes: {
-      onChannelSwitch: React.PropTypes.func
+      onChannelSwitch: React.PropTypes.func,
+      initialChannel: React.PropTypes.string
     },
 
     channelSwitchHandler: function channelSwitchHandler(newChannel) {
@@ -38174,7 +38176,7 @@ module.exports = function (domElem) {
 
     render: function render() {
       var messages = this.props.data.map(function (message, i) {
-        return React.createElement(Message, { key: i, name: message.name, text: message.text });
+        return React.createElement(Message, { key: i, name: message.name, text: message.message });
       });
 
       return React.createElement(
