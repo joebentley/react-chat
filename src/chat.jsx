@@ -6,7 +6,7 @@ const socket = require('socket.io-client')()
 module.exports = function (domElem) {
   let Chat = React.createClass({
     getInitialState: function () {
-      return { username: '', data: [] }
+      return { username: '', data: [], user: { channel: '#general' } }
     },
 
     componentDidMount: function () {
@@ -44,7 +44,8 @@ module.exports = function (domElem) {
     render: function () {
       return (
         <div className="row panel panel-default chat-app row-eq-height">
-          <ChannelList onChannelSwitch={this.handleChannelSwitch} />
+          <ChannelList onChannelSwitch={this.handleChannelSwitch}
+                       initialChannel={this.state.user.channel} />
           <div className="col-xs-9 panel-body">
             <MessageList data={this.state.data} />
             <div className="row bottom chat-input-container">
@@ -62,23 +63,17 @@ module.exports = function (domElem) {
       initialChannel: React.PropTypes.string
     },
 
-    channelSwitchHandler: function (newChannel) {
+    channelSwitchHandler: function (e) {
+      const newChannel = e.target.text
+      this.setState({ currentChannel: newChannel })
+
       socket.emit('switchChannel', newChannel)
 
       this.props.onChannelSwitch(newChannel)
     },
 
-    constructOnClickHandler: function () {
-      return (e) => {
-        $('.channel').removeClass('channel-clicked')
-        $(e.target).addClass('channel-clicked')
-
-        this.channelSwitchHandler(e.target.text)
-      }
-    },
-
     getInitialState: function () {
-      return { channels: [] }
+      return { channels: [], currentChannel: '' }
     },
 
     componentDidMount: function () {
@@ -86,14 +81,23 @@ module.exports = function (domElem) {
 
       socket.on('channels', (channels) => {
         this.setState({channels})
+        this.setState({ currentChannel: this.props.initialChannel })
       })
     },
 
     render: function () {
       let channels = this.state.channels.map((channel, i) => {
+        // Set class depending on whether this is the users current channel or not
+        let classes
+        if (channel === this.state.currentChannel) {
+          classes = 'channel channel-selected'
+        } else {
+          classes = 'channel'
+        }
+
         return (
           <span key={i}>
-            <a className="channel" onClick={this.constructOnClickHandler()}
+            <a className={classes} onClick={this.channelSwitchHandler}
                href={channel}>{channel}</a><br />
           </span>
         )

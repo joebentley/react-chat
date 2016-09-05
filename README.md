@@ -49,6 +49,7 @@ $ ./watch.sh
   * ~~Clickable channel list~~
   * ~~Switchable channels (e.g. Slack)~~
   * Ability to add/remove new channels
+  * Have navigation to `/#channel` switch to `#channel`
 
 
 * Chrome desktop notifications
