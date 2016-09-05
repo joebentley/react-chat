@@ -41,7 +41,14 @@ exports.listenSocket = function (io, redisClient) {
         if (err) {
           throw err
         }
-        socket.emit('messages', messages)
+
+        users.getUser(username, function (err, user) {
+          if (err) {
+            throw err
+          }
+
+          io.to(user.channel).emit('messages', messages)
+        })
       })
     })
 
@@ -60,8 +67,11 @@ exports.listenSocket = function (io, redisClient) {
         if (user !== null) {
           user = JSON.parse(user)
 
+          // Switch channel
+          socket.leave(user.channel)
           user.channel = newChannel
           redisClient.hmset('users', username, JSON.stringify(user))
+          socket.join(newChannel)
 
           socket.emit('channelSwitched')
         }
