@@ -10,6 +10,7 @@ exports.listenSocket = function (io, redisClient) {
     let users = User(redisClient)
     let messages = Message(redisClient)
 
+    // If user has a username, look up their room from redis and join their socket to that room
     if (username !== undefined) {
       users.attachSocket(username, socket, function (err) {
         if (err) {
@@ -47,12 +48,14 @@ exports.listenSocket = function (io, redisClient) {
             throw err
           }
 
+          // Broadcast to all users on current user's channel
           io.to(user.channel).emit('messages', messages)
         })
       })
     })
 
     socket.on('getChannels', function () {
+      // TODO: Move these into redis, and allow user to create new rooms
       let channels = ['#general', '#random', '#images']
 
       socket.emit('channels', channels)
@@ -67,11 +70,13 @@ exports.listenSocket = function (io, redisClient) {
         if (user !== null) {
           user = JSON.parse(user)
 
-          // Switch channel
+          // Switch socket room
           socket.leave(user.channel)
+          socket.join(newChannel)
+
+          // Push user with new channel to redis
           user.channel = newChannel
           redisClient.hmset('users', username, JSON.stringify(user))
-          socket.join(newChannel)
 
           socket.emit('channelSwitched')
         }

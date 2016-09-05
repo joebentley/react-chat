@@ -32,6 +32,7 @@ module.exports = function (redisClient) {
           callback(err)
         }
 
+        // Get current number of messages for ID
         redisClient.llen('messages', function (err, length) {
           if (err) {
             callback(err)
@@ -44,12 +45,14 @@ module.exports = function (redisClient) {
             channel: user.channel
           }
 
+          // Push new message onto list
           redisClient.rpush('messages', JSON.stringify(newMessage), function () {
             redisClient.lrange('messages', 0, -1, function (err, data) {
               if (err) {
                 callback(err)
               }
 
+              // Return all messages that are in the user's channel
               callback(null, data.map(JSON.parse).filter((message) => {
                 return message.channel === user.channel
               }))

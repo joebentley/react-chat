@@ -20,11 +20,10 @@ router.post('/', function (req, res, next) {
   const userModel = User(redisClient)
   const newUser = { username: req.body.username, channel: '#general' }
 
-  userModel.newUser(newUser, function (err) {
+  userModel.updateUser(newUser, function (err) {
     if (err) {
       next(err)
     }
-
     res.redirect('/')
   })
 })

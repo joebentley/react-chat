@@ -15,8 +15,8 @@ describe('User', function () {
 
   before(function (done) {
     redisClient.flushdb()
-    userModel.newUser(testUser, function () {
-      userModel.newUser(testUser2, done)
+    userModel.updateUser(testUser, function () {
+      userModel.updateUser(testUser2, done)
     })
   })
 

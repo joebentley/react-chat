@@ -22,14 +22,16 @@ module.exports = function (redisClient) {
           callback(err)
         }
 
-        if (user !== null) {
+        if (user[0] !== null) {
           user = JSON.parse(user)
           callback(null, user)
+        } else {
+          callback(null, null)
         }
       })
     },
 
-    newUser: function (newUser, callback) {
+    updateUser: function (newUser, callback) {
       redisClient.hset('users', newUser.username, JSON.stringify(newUser), callback)
     }
   }

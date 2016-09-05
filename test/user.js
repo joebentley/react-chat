@@ -12,7 +12,7 @@ describe('User', function () {
 
   before(function () {
     redisClient.flushdb()
-    userModel.newUser(testUser)
+    userModel.updateUser(testUser)
   })
 
   describe('#attachSocket', function () {
@@ -30,45 +30,51 @@ describe('User', function () {
   })
 
   describe('#getUser', function () {
-    it('test user should be added', function (done) {
+    it('should get test user when added', function (done) {
       userModel.getUser('Joe', function (err, user) {
-        if (err) {
-          done(err)
-        }
-
         should.not.exist(err)
         user.should.deep.equal(testUser)
         done()
       })
     })
+
+    it('should give null if user does not exist', function (done) {
+      userModel.getUser('JOE', function (err, user) {
+        should.not.exist(err)
+        should.not.exist(user)
+        done()
+      })
+    })
   })
 
-  describe('#newUser', function () {
-    it('new user should be added properly', function (done) {
+  describe('#getUsers', function () {
+  })
+
+  describe('#updateUser', function () {
+    it('should add new user and update existing user', function (done) {
+      redisClient.flushdb()
       let testUser2 = { username: 'Marie', channel: '#random' }
 
-      userModel.newUser(testUser2, function (err, response) {
-        if (err) {
-          done(err)
-        }
+      userModel.updateUser(testUser2, function (err, response) {
         should.not.exist(err)
-        response.should.equal(1) // field should not already exist
+        response.should.equal(1) // user should not already exist
 
+        // Get user back from redis
         userModel.getUser('Marie', function (err, user) {
-          if (err) {
-            done(err)
-          }
           should.not.exist(err)
           user.should.deep.equal(testUser2)
 
+          // Now change user and update
           testUser2.channel = '#general'
-          userModel.newUser(testUser2, function (err, response) {
-            if (err) {
-              done(err)
-            }
+          userModel.updateUser(testUser2, function (err, response) {
             should.not.exist(err)
-            response.should.equal(0) // field should already exist
-            done()
+            response.should.equal(0) // user should already exist
+
+            userModel.getUser('Marie', function (err, user) {
+              should.not.exist(err)
+              user.should.deep.equal(testUser2)
+              done()
+            })
           })
         })
       })
