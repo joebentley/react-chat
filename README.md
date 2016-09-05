@@ -29,7 +29,7 @@ $ ./watch.sh
 
   * ~~Model for handling users~~
 
-  * Move users and messages from API into separate models
+  * ~~Move users and messages from API into separate models~~
   
 
 * Login page
@@ -47,7 +47,8 @@ $ ./watch.sh
 * Channels
 
   * ~~Clickable channel list~~
-  * Switchable channels (e.g. Slack)
+  * ~~Switchable channels (e.g. Slack)~~
+  * Ability to add/remove new channels
 
 
 * Chrome desktop notifications
