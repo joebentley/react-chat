@@ -10,11 +10,13 @@ exports.listenSocket = function (io, redisClient) {
     let users = User(redisClient)
     let messages = Message(redisClient)
 
-    users.attachSocket(username, socket, function (err) {
-      if (err) {
-        throw err
-      }
-    })
+    if (username !== undefined) {
+      users.attachSocket(username, socket, function (err) {
+        if (err) {
+          throw err
+        }
+      })
+    }
 
     socket.on('getUser', function () {
       users.getUser(username, function (err, user) {
