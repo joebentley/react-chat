@@ -17,7 +17,25 @@ module.exports = function (domElem) {
       })
 
       socket.on('messages', (data) => {
+        var oldData = this.state.data
         this.setState({ data })
+
+        if (this.state.data.length > oldData.length) {
+          let n = new Notification('New message')
+          setTimeout(n.close.bind(n), 5000)
+
+          var count = 11;
+          (function flash () {
+            if (count % 2 === 0) {
+              document.title = 'New message'
+            } else {
+              document.title = 'React Chat App'
+            }
+            if (count-- > 0) {
+              setTimeout(flash, 500)
+            }
+          })()
+        }
       })
 
       socket.on('connect', function () {
@@ -121,9 +139,6 @@ module.exports = function (domElem) {
     componentDidUpdate: function () {
       // Scroll to bottom of messages
       $('#messageList').scrollTop($('#messageList')[0].scrollHeight)
-
-      let n = new Notification('New message')
-      setTimeout(n.close.bind(n), 2000)
     },
 
     render: function () {

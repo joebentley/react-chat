@@ -37985,6 +37985,8 @@ module.exports = yeast;
 },{}],218:[function(require,module,exports){
 'use strict';
 
+/* global Notification */
+
 var $ = require('jquery');
 var React = require('react');
 var ReactDOM = require('react-dom');
@@ -38006,7 +38008,25 @@ module.exports = function (domElem) {
       });
 
       socket.on('messages', function (data) {
+        var oldData = _this.state.data;
         _this.setState({ data: data });
+
+        if (_this.state.data.length > oldData.length) {
+          var n = new Notification('New message');
+          setTimeout(n.close.bind(n), 5000);
+
+          var count = 11;
+          (function flash() {
+            if (count % 2 === 0) {
+              document.title = 'New message';
+            } else {
+              document.title = 'React Chat App';
+            }
+            if (count-- > 0) {
+              setTimeout(flash, 500);
+            }
+          })();
+        }
       });
 
       socket.on('connect', function () {
@@ -38204,13 +38224,17 @@ module.exports = function (domElem) {
 },{"jquery":54,"react":203,"react-dom":60,"socket.io-client":204}],219:[function(require,module,exports){
 'use strict';
 
+/* globals Notification */
+
 var $ = require('jquery');
 var chat = require('./chat.jsx');
 
 $(function () {
-  if ($('#chatContainer').length > 0) {
-    chat($('#chatContainer')[0]);
-  }
+  Notification.requestPermission(function () {
+    if ($('#chatContainer').length > 0) {
+      chat($('#chatContainer')[0]);
+    }
+  });
 });
 
 },{"./chat.jsx":218,"jquery":54}],220:[function(require,module,exports){
