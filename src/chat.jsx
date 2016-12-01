@@ -1,3 +1,5 @@
+/* global Notification */
+
 const $ = require('jquery')
 const React = require('react')
 const ReactDOM = require('react-dom')
@@ -119,6 +121,9 @@ module.exports = function (domElem) {
     componentDidUpdate: function () {
       // Scroll to bottom of messages
       $('#messageList').scrollTop($('#messageList')[0].scrollHeight)
+
+      let n = new Notification('New message')
+      setTimeout(n.close.bind(n), 2000)
     },
 
     render: function () {
